@@ -5,17 +5,21 @@ Created on Tue Aug 11 18:00:55 2020
 @author: subham
 """
 #importing libraries
-import math
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import LSTM
-from sklearn.metrics import mean_squared_error
-
+try:
+    import math
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from sklearn.preprocessing import StandardScaler
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+    from tensorflow.keras.layers import LSTM
+    from sklearn.metrics import mean_squared_error
+    
+except Exception as e:
+    print("Unable to load the Libraries",e)
+    
 #loading dataset
 dataset=pd.read_csv("infy_stock.csv")
 
@@ -83,20 +87,14 @@ model.summary()
 #fitting the model
 model.fit(X_train, Y_train, validation_data=(X_test, Y_test),epochs=100, batch_size=64, verbose=1)
 
+#saving the model
+model.save('LSTM_model.h5')
+
 #predict from model
 train_pred =model.predict(X_train)
 test_pred  =model.predict(X_test)
 
-#reverse scaling
-train_pred =scaler.inverse_transform(train_pred)
-test_pred  =scaler.inverse_transform(test_pred)
-
-#checking the error
-print("For Train data",math.sqrt(mean_squared_error(Y_train,train_pred)))
-print("For Test data",math.sqrt(mean_squared_error(Y_test,test_pred)))
-
-
-
+#plotting the results for test
 plt.plot(Y_test, color='blue', label='Real_stock_price')
 plt.plot(test_pred, color='red', label='Predicted_stock_price')
 plt.title('Infy Stock price prediction')
@@ -105,6 +103,8 @@ plt.ylabel('Price')
 plt.legend()
 plt.show()
 
+
+#plotting the results for train
 plt.plot(Y_train, color='blue', label='Real_stock_price')
 plt.plot(train_pred, color='red', label='Predicted_stock_price')
 plt.title('Infy Stock price prediction')
@@ -112,3 +112,11 @@ plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
 plt.show()
+
+#reverse scaling
+train_pred =scaler.inverse_transform(train_pred)
+test_pred  =scaler.inverse_transform(test_pred)
+
+#checking the error
+print("For Train data",math.sqrt(mean_squared_error(Y_train,train_pred)))
+print("For Test data",math.sqrt(mean_squared_error(Y_test,test_pred)))
